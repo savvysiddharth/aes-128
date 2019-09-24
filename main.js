@@ -16,21 +16,6 @@ Array.prototype.rotate = (function() {
   };
 })();
 
-//GFIELD THING -START
-function findDegree(num){
-  return (dec2bin(num)).length;
-}
-function gfmultiply(a,b){
-  let p = a*b;
-  if(findDegree(p) < 8){
-    return dec2bin(p);
-  }else{
-    let ans = p % 283;
-    return dec2bin(ans);
-  }
-}
-//GFIELD THING -END
-
 //gives padded binary string matrix from decimal matrix
 function dec2binMatrix(arr) {
   let newarr = [];
@@ -59,7 +44,7 @@ function matrixMultiply(m1, m2) {
         var sum = 0;
         for (var k = 0; k < m1[0].length; k++) {
             const m2_val = parseInt(m2[k][j], 2);
-            const multiplied = multiply(m1[i][k], m2_val, 8);
+            const multiplied = GFmultiply(m1[i][k], m2_val, 8);
             sum ^= parseInt(multiplied,2);
         }
         result[i][j] = sum;
@@ -240,45 +225,86 @@ function aes_init() {
     return;
   }
 
+  // const plain_text = "Two One Nine Two";
+  // const ikey = "Thats my Kung Fu";
+
   let input = get4x4matrix(plain_text); //input matrix
   let key = get4x4matrix(ikey); //key matrix
 
   //ADD ROUND KEY - 0
   let state_arr = addRoundKey(input, key);
 
-  console.log('add round key - 0');
-  printHexTable(state_arr);
+  const stepsBox = document.querySelector("#results-container");
+  stepsBox.innerHTML = '';
+
+  stepsBox.innerHTML += "<h2> ROUND : "+ 0 +"</h2> <br>";
+
+  stepsBox.innerHTML += "Input:";
+  stepsBox.appendChild(createTable(getHexTable(input)));
+  stepsBox.innerHTML += "<br>";
+
+  stepsBox.innerHTML += "Key:";
+  stepsBox.appendChild(createTable(getHexTable(key)));
+  stepsBox.innerHTML += "<br>";
+
+  stepsBox.innerHTML += "Add round key:";
+  stepsBox.appendChild(createTable(getHexTable(state_arr)));
+  stepsBox.innerHTML += "<br>";
 
   const TOTAL_ROUNDS = 10;
 
   round = 1;
+
   while(round <= TOTAL_ROUNDS) {
+    stepsBox.innerHTML += "<hr><br>"
+    stepsBox.innerHTML += "<h2> ROUND : "+round+"</h2> <br>";
+
     //SUBSTITUTION BYTES
     state_arr = substituteBytes(state_arr);
+
+    stepsBox.innerHTML += "Substitution bytes:";
+    stepsBox.appendChild(createTable(getHexTable(state_arr)));
+    stepsBox.innerHTML += "<br>";
 
     //SHIFT ROWS
     state_arr = shiftRows(state_arr);
 
+    stepsBox.innerHTML += "Shift rows:";
+    stepsBox.appendChild(createTable(getHexTable(state_arr)));
+    stepsBox.innerHTML += "<br>";
+
     //MIX COLUMNS
-    if(round != 10)
+    if(round != 10) {
       state_arr = mixColumns(state_arr);
+      stepsBox.innerHTML += "Mix columns:";
+      stepsBox.appendChild(createTable(getHexTable(state_arr)));
+      stepsBox.innerHTML += "<br>";
+    }
 
     //GENERATING NEW KEY
     key = getNextKey(key , round);
+    stepsBox.innerHTML += "This round key:";
+    stepsBox.appendChild(createTable(getHexTable(key)));
+    stepsBox.innerHTML += "<br>";
 
     //ADD ROUND KEY
     state_arr = addRoundKey(state_arr, key);
+    stepsBox.innerHTML += "Add round key:";
+    stepsBox.appendChild(createTable(getHexTable(state_arr)));
+    stepsBox.innerHTML += "<br>";
 
     round++;
   }
 
-  console.log('add ROund key:');
-  printHexTable(state_arr);
 
-  createTable(getHexTable(state_arr));
+  const resultBox = document.querySelector("#resultbox");
+  resultBox.innerHTML = 'Final result: <br><br>';
+  resultBox.appendChild(createTable(getHexTable(state_arr)));
 }
 
-function rotWord(l){
+
+//rotates left with 1 unit
+function rotateLeftOneUnit(l){
   let temp = []
   temp = l.slice(1)
   temp.push(l[0])
@@ -287,7 +313,7 @@ function rotWord(l){
 
 function leftShift(l, shiftBy){
   for(let i=0;i<shiftBy;i++){
-    l = rotWord(l)
+    l = rotateLeftOneUnit(l)
   }
   return l
 }
@@ -300,7 +326,7 @@ function xorList(l1,l2){
   return res
 }
 
-function padTo8(str) {
+function padTo15(str) {
   let padding = '';
   for(let i=0; i<15-str.length; i++) {
     padding += '0';
@@ -308,11 +334,20 @@ function padTo8(str) {
   return padding + str;
 }
 
-function multiply(A,B,N){ //145
+function count(l,num){
+  let count = 0
+  for(let i=0;i<l.length;i++)
+    if(l[i]==num){
+      count++
+    }
+  return count
+}
+
+function GFmultiply(A,B,N){ //145
   A = dec2bin(A);
   B = dec2bin(B);
-  A = padTo8(A);
-  B = padTo8(B);
+  A = padTo15(A);
+  B = padTo15(B);
   let tempA = []
   let tempB = []
   for(let i=0;i<A.length;i++){
@@ -369,17 +404,5 @@ function createTable(tableData) {
 
   table.appendChild(tableBody);
 
-  const resultBox = document.querySelector("#resultbox");
-  resultBox.innerHTML = '';
-
-  resultBox.appendChild(table);
-}
-
-function count(l,num){
-  let count = 0
-  for(let i=0;i<l.length;i++)
-    if(l[i]==num){
-      count++
-    }
-  return count
+  return table;
 }

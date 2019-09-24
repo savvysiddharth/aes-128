@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>AES-128</title>
+  <style>
+    body {
+      background-color: black;
+      color :rgb(240, 240, 240);
+      font-family: monospace;
+      font-size: 20px;
+    }
+
+    table {
+      border-collapse: collapse;
+    }
+
+    table, th, td {
+      border: 1px solid rgb(200, 200, 200);
+    }
+
+    td {
+      padding: 10px 10px;
+      font-size: 22px;
+    }
+
+    button {
+      background-color: rgba(0,0,0,0);
+      color :rgb(240, 240, 240);
+      padding: 10px 20px;
+      border: 1px solid white;
+      font-family: monospace;
+    }
+
+    input {
+      background-color: rgba(0,0,0,0);
+      color :rgb(240, 240, 240);
+      padding: 5px 10px;
+      border: 1px solid white;
+      text-align: center;
+      color: rgb(86, 242, 27);
+      font-family: monospace;
+      font-weight: bold;
+    }
+
+
+  </style>
+</head>
+<body>
+  <div class="user-inputs">
+    plain text :
+    <br>
+    <input placeholder="enter text here" type="text" id="plain_text" value="Two One Nine Two">
+    <br><br>
+    key : <br>
+    <input placeholder="enter text here" type="text" id="key" value="Thats my Kung Fu">
+    <br><br>
+    <button onclick="aes_init()">encrypt</button>
+    <br><br>
+  </div>
+
+  <div id="resultbox"></div>
+</body>
+<script src="main.js"></script>
+</html>
